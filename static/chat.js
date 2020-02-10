@@ -1,7 +1,8 @@
 OneChat = {
   "chatterName": "",
   "senderURL": "http://localhost:20000/send",
-  "readerURL": "http://localhost:20000/read"
+  "readerURL": "http://localhost:20000/read",
+  "goodbyeURL": "http://localhost:20000/bye",
 }
 
 function ChatMsg(msg) {
@@ -70,23 +71,39 @@ function ChatMsg(msg) {
         e.preventDefault()
         return void(0)
       }
-      var oReq = new XMLHttpRequest()
-      oReq.open("POST", OneChat.senderURL)
-      oReq.setRequestHeader("Content-Type", "application/json")
-      oReq.onload = function() {
-        if (OneChat.addMsg("send", msg)) {
-          OneChat.chatText.value = ""
-        }
-      }
-      oReq.onerror = function() {
-        if (oReq.status == 412) {
-          OneChat.addMsg("err", {"msg": "You don't have entry in this chat. Please re-login.", "sender": "Chat System"})
+      if (RegExp('^/').test(msg["msg"])) {
+        /* command mode */
+        if (msg["msg"] == "/bye") {
+          var oReq = new XMLHttpRequest()
+          oReq.open("GET", OneChat.goodbyeURL + '?s=' + OneChat.sessionID)
+          oReq.send()
+          OneChat.addMsg("recv", {"msg": "You got logged out. Thank you for playing. See you again.", "sender": "Chat System"})
           window.clearTimeout(OneChat.timer)
+        } else if (msg["msg"] == "/clear") {
+          OneChat.chatWindow.innerHTML = ""
         } else {
-          OneChat.addMsg("err", {"msg": "Something happen.", "sender": "Chat System"})
+          OneChat.addMsg("err", {"msg": (msg["msg"] + " is Unknown command."), "sender": "Chat System"})
         }
+        OneChat.chatText.value = ""
+      } else {
+        var oReq = new XMLHttpRequest()
+        oReq.open("POST", OneChat.senderURL)
+        oReq.setRequestHeader("Content-Type", "application/json")
+        oReq.onload = function() {
+          if (OneChat.addMsg("send", msg)) {
+            OneChat.chatText.value = ""
+          }
+        }
+        oReq.onerror = function() {
+          if (oReq.status == 412) {
+            OneChat.addMsg("err", {"msg": "You don't have entry in this chat. Please re-login.", "sender": "Chat System"})
+            window.clearTimeout(OneChat.timer)
+          } else {
+            OneChat.addMsg("err", {"msg": "Something happen.", "sender": "Chat System"})
+          }
+        }
+        oReq.send(JSON.stringify(msg))
       }
-      oReq.send(JSON.stringify(msg))
       e.stopPropagation()
       e.preventDefault()
     })

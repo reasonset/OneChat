@@ -44,6 +44,7 @@ srv.mount_proc "/send" do |req, res|
 end
 
 srv.mount_proc "/read" do |req, res|
+  pp LOG
   q = req.query
   unless (/^[0-9]$/ === q["p"])
     res.status = 400
@@ -76,6 +77,10 @@ srv.mount_proc "/init" do |req, res|
       SESSIONS[chatter[:session]] = chatter
       NAMELIST[name] = chatter[:session]
     end
+    M.synchronize do
+      LOG.push({"msg" => "User #{name} is logged in.", "sender" => "Chat System", "icon" => "0"})
+      @logpoint += 1
+    end
     res.body = JSON.dump({"sessionID" => sess})
     res.content_type = "application/json; charset=UTF-8"
   elsif NAMELIST[name]
@@ -85,6 +90,22 @@ srv.mount_proc "/init" do |req, res|
     res.status = 400
     res.body = "INVALID"
   end
+end
+
+srv.mount_proc "/bye" do |req, res|
+  q = req.query
+  s = (SESSIONS[q["s"]][:name] rescue nil)
+  if s
+    NM.synchronize do
+      NAMELIST.delete(s)
+      SESSIONS.delete(q["s"])
+    end
+    M.synchronize do
+      LOG.push({"msg" => "User #{s} is logged out.", "sender" => "Chat System", "icon" => "0"})
+      @logpoint += 1
+    end
+  end
+  res.status = 204
 end
 
 
