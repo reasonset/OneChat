@@ -1,0 +1,36 @@
+<html>
+  <head>
+    <script defer="defer" src="chat.js"></script>
+    <link rel="stylesheet" href="skin.css" />
+    <meta charset="UTF-8" />
+  </head>
+  <body>
+    <section id="InitialWindow">
+      <form id="InitialForm" action="/init" method="post">
+        <section>
+          Your Name: <input type="text" name="chatter_name" size="24" />
+          <input type="submit" name="fire" value="Log in" id="NameRegister" />
+        </section>
+        <section>
+          Choice your icon:
+            <label><input type="radio" name="icon" value="1" /><img src="/icons/1" height="48" width="48" /></label>
+            <label><input type="radio" name="icon" value="2" /><img src="/icons/2" height="48" width="48" /></label>
+            <label><input type="radio" name="icon" value="3" /><img src="/icons/3" height="48" width="48" /></label>
+            <label><input type="radio" name="icon" value="4" /><img src="/icons/4" height="48" width="48" /></label>
+        </section>
+      </form>
+      <p>Please submit your name.</p>
+      <p>You cannot use any character <code>!?#&amp;&quot;'&gt;&lt;</code> and maximum length is 48.</p>
+      <p>This system is <strong>very experimental.</strong> Please use with your care and understanding what is this.</p>
+      <p>OneChat is developed by Masaki Haruka. This is essential modern chat system.</p>
+    </section>
+    <section id="ChatWindow"></section>
+    <section id="ChatEnd"></section>
+    <section id="ChatFormLayout">
+      <form id="ChatBox">
+        <section id="ChatTextContainer"><input type="text" id="ChatText" /></section>
+        <section id="ChatSubmit"><input type="image" alt="送信" id="ChatSubmit" src="/send.png" /></section>
+      </form>  
+    </section>
+  </body>
+</html>
