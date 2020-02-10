@@ -14,14 +14,17 @@ SESSIONS = {}
 NAMELIST = {}
 LOG = []
 @logpoint = 0
+M = Mutex.new
 
 srv.mount_proc "/send" do |req, res|
   reqson = req.body&.force_encoding("UTF-8")
   if(reqson && reqson.valid_encoding? && (json = JSON.load(reqson) rescue nil) && SESSIONS[json["session"]] && (chat = json["msg"]&.force_encoding("UTF-8")) && chat.valid_encoding? && chat.length > 0)
-    LOG.push({"msg" => chat[0, 256], "sender" => SESSIONS[json["session"]][:name], "icon" => SESSIONS[json["session"]][:icon]})
-    if LOG.length > 200
-      # File.open("archives/#{DateTime.now.strftime('%Y%m%d%H%M%S')}.json") {|f| JSON.dump(LOG[0, 100], f)}
-      LOG.slice!(0, 100)
+    M.syncronize do
+      LOG.push({"msg" => chat[0, 256], "sender" => SESSIONS[json["session"]][:name], "icon" => SESSIONS[json["session"]][:icon]})
+      if LOG.length > 200
+        # File.open("archives/#{DateTime.now.strftime('%Y%m%d%H%M%S')}.json") {|f| JSON.dump(LOG[0, 100], f)}
+        LOG.slice!(0, 100)
+      end
     end
     @logpoint += 1
     SESSIONS[json["session"]][:lastseen] = DateTime.now
