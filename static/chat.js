@@ -79,7 +79,12 @@ function ChatMsg(msg) {
         }
       }
       oReq.onerror = function() {
-        OneChat.addMsg("err", {"msg": "Something happen.", "sender": "Chat System"})
+        if (oReq.status == 412) {
+          OneChat.addMsg("err", {"msg": "You don't have entry in this chat. Please re-login.", "sender": "Chat System"})
+          window.clearTimeout(OneChat.timer)
+        } else {
+          OneChat.addMsg("err", {"msg": "Something happen.", "sender": "Chat System"})
+        }
       }
       oReq.send(JSON.stringify(msg))
       e.stopPropagation()
@@ -87,7 +92,7 @@ function ChatMsg(msg) {
     })
     OneChat.getMessage = function() {
       var oReq = new XMLHttpRequest()
-      oReq.open("GET", OneChat.readerURL + "?p=" + OneChat.point + '&n=' + OneChat.chatterName)
+      oReq.open("GET", OneChat.readerURL + "?p=" + OneChat.point + '&s=' + OneChat.sessionID)
       oReq.onreadystatechange = function() {
         if (oReq.readyState == 4) {
           if (oReq.status == 200) {
@@ -98,13 +103,16 @@ function ChatMsg(msg) {
           } else if (oReq.status == 204) {
             if (nextInverval < 20000) { nextInverval = nextInverval + 1000 }
             return void(0)
+          } else if (oReq.status == 412) {
+            OneChat.addMsg("err", {"msg": "You don't have entry in this chat. Please re-login.", "sender": "Chat System"})
+            window.clearTimeout(OneChat.timer)
           } else {
             console.log("Server returns some error (" + oReq.status + ') on getting message.')
           }
         }
       }
       oReq.send()
-      window.setTimeout(OneChat.getMessage, nextInverval)
+      OneChat.timer = window.setTimeout(OneChat.getMessage, nextInverval)
     }
   }
 
