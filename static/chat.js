@@ -115,7 +115,9 @@ function ChatMsg(msg) {
           if (oReq.status == 200) {
             var recvMsg = JSON.parse(oReq.responseText)
             OneChat.point = recvMsg["point"]
-            recvMsg["log"].forEach(function(i) {OneChat.addMsg("recv", i)})
+            recvMsg["log"].forEach(function(i) {
+              if (i["sender"] != OneChat.chatterName) { OneChat.addMsg("recv", i) }
+            })
             nextInverval = 5000
           } else if (oReq.status == 204) {
             if (nextInverval < 20000) { nextInverval = nextInverval + 1000 }

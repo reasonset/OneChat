@@ -60,7 +60,6 @@ srv.mount_proc "/read" do |req, res|
   log_diff = 100 if log_diff > 100
   if log_diff > 0
     log_slice = LOG.last(log_diff)
-    log_slice = log_slice.reject {|i| i["sender"] == s }
     res.body = JSON.dump({"point" => @logpoint, "log" => log_slice})
     res.content_type = "application/json; charset=UTF-8"
   else
