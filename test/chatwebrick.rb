@@ -57,7 +57,7 @@ srv.mount_proc "/read" do |req, res|
     next
   end
   log_diff = @logpoint - qp
-  log_diff = 100 if log_diff > 100
+  log_diff = 30 if log_diff > 30
   if log_diff > 0
     log_slice = LOG.last(log_diff)
     res.body = JSON.dump({"point" => @logpoint, "log" => log_slice})

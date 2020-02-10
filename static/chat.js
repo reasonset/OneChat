@@ -34,6 +34,7 @@ function ChatMsg(msg) {
     OneChat.chatEnd = document.getElementById("ChatEnd")
     OneChat.onBottom = false
     OneChat.point = 0
+    OneChat.firstTaken = true
     OneChat.addMsg = function(msgtype, msg) {
       if (!(msgtype == "err" || msgtype == "recv" || msgtype == "send" || (! RegExp('/^[0-9]+$').test(msg["icon"])) )) {
         msgtype = "err"
@@ -116,8 +117,9 @@ function ChatMsg(msg) {
             var recvMsg = JSON.parse(oReq.responseText)
             OneChat.point = recvMsg["point"]
             recvMsg["log"].forEach(function(i) {
-              if (i["sender"] != OneChat.chatterName) { OneChat.addMsg("recv", i) }
+              if (i["sender"] != OneChat.chatterName || OneChat.firstTaken) { OneChat.addMsg("recv", i) }
             })
+            if (OneChat.firstTaken) { OneChat.firstTaken = false }
             nextInverval = 5000
           } else if (oReq.status == 204) {
             if (nextInverval < 20000) { nextInverval = nextInverval + 1000 }
