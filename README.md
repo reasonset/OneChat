@@ -8,6 +8,8 @@ Simple, essential and modern chat server.
 * Asyncronous sending.
 * Lightweight and high-speed chat server.
 
+Demonstration in [YouTube](https://youtu.be/D93g4Upgjws).
+
 # Usage
 
 Currently not supported for practical use.
